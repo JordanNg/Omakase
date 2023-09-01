@@ -1,9 +1,9 @@
+import 'dart:async';
 import 'dart:convert' show jsonDecode;
-// import 'dart:ffi';
+import 'api_keys.dart';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-// import 'dart:developer';
 import 'dart:math';
 import 'package:provider/provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -24,7 +24,11 @@ class MyApp extends StatelessWidget {
         child: MaterialApp(
           title: 'Yelp Fetch',
           theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
+            colorScheme: const ColorScheme.highContrastLight(
+              primary: Colors.black87,
+              secondary: Colors.white,
+              tertiary: Colors.red,
+            ),
             useMaterial3: true,
           ),
           home: const HomepageRoute(),
@@ -63,7 +67,7 @@ class _HomepageRouteState extends State<HomepageRoute> {
         appState.latLong['long'] = value.longitude;
       });
     }).catchError((error) {
-      print(error);
+      // print(error);
     });
 
     // ! Probably should wait to see if the location could be set before rendering the page
@@ -76,21 +80,28 @@ class _HomepageRouteState extends State<HomepageRoute> {
         children: [
           Container(
             padding: const EdgeInsets.only(bottom: 32),
+            child: const Text(
+              'お任せ',
+              style: TextStyle(fontSize: 90, fontWeight: FontWeight.bold),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.only(bottom: 32),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Image.asset(
-                  'images/png-transparent-flutter-hd-logo.png',
+                  'images/icon_flutter.png',
+                  height: 50,
+                  fit: BoxFit.contain,
+                ),
+                Image.asset(
+                  'images/yelp_burst.png',
                   height: 50,
                   fit: BoxFit.contain,
                 ),
                 Image.asset(
                   'images/Google-Maps-logo.png',
-                  height: 50,
-                  fit: BoxFit.contain,
-                ),
-                Image.asset(
-                  'images/Yelp_Logo.svg.png',
                   height: 50,
                   fit: BoxFit.contain,
                 ),
@@ -122,7 +133,7 @@ class _HomepageRouteState extends State<HomepageRoute> {
                         foregroundColor:
                             selectedPrice == 1 ? Colors.white : null,
                         backgroundColor:
-                            selectedPrice == 1 ? Colors.redAccent : null,
+                            selectedPrice == 1 ? Colors.black87 : null,
                       ),
                       onPressed: () {
                         setState(() {
@@ -138,7 +149,7 @@ class _HomepageRouteState extends State<HomepageRoute> {
                         foregroundColor:
                             selectedPrice == 2 ? Colors.white : null,
                         backgroundColor:
-                            selectedPrice == 2 ? Colors.redAccent : null,
+                            selectedPrice == 2 ? Colors.black87 : null,
                       ),
                       onPressed: () {
                         setState(() {
@@ -154,7 +165,7 @@ class _HomepageRouteState extends State<HomepageRoute> {
                         foregroundColor:
                             selectedPrice == 3 ? Colors.white : null,
                         backgroundColor:
-                            selectedPrice == 3 ? Colors.redAccent : null,
+                            selectedPrice == 3 ? Colors.black87 : null,
                       ),
                       onPressed: () {
                         setState(() {
@@ -177,7 +188,7 @@ class _HomepageRouteState extends State<HomepageRoute> {
                         foregroundColor:
                             selectedRadius == 1609 ? Colors.white : null,
                         backgroundColor:
-                            selectedRadius == 1609 ? Colors.redAccent : null,
+                            selectedRadius == 1609 ? Colors.black87 : null,
                       ),
                       onPressed: () {
                         setState(() {
@@ -193,7 +204,7 @@ class _HomepageRouteState extends State<HomepageRoute> {
                         foregroundColor:
                             selectedRadius == 8046 ? Colors.white : null,
                         backgroundColor:
-                            selectedRadius == 8046 ? Colors.redAccent : null,
+                            selectedRadius == 8046 ? Colors.black87 : null,
                       ),
                       onPressed: () {
                         setState(() {
@@ -209,7 +220,7 @@ class _HomepageRouteState extends State<HomepageRoute> {
                         foregroundColor:
                             selectedRadius == 24140 ? Colors.white : null,
                         backgroundColor:
-                            selectedRadius == 24140 ? Colors.redAccent : null,
+                            selectedRadius == 24140 ? Colors.black87 : null,
                       ),
                       onPressed: () {
                         setState(() {
@@ -225,7 +236,7 @@ class _HomepageRouteState extends State<HomepageRoute> {
                         foregroundColor:
                             selectedRadius == 40000 ? Colors.white : null,
                         backgroundColor:
-                            selectedRadius == 40000 ? Colors.redAccent : null,
+                            selectedRadius == 40000 ? Colors.black87 : null,
                       ),
                       onPressed: () {
                         setState(() {
@@ -283,7 +294,7 @@ class _YelpResultRouteState extends State<YelpResultRoute> {
   void initState() {
     super.initState();
 
-    // Get the MyappState
+    // Get the MyAppState
     var appState = context.read<MyAppState>();
     // Get the price and the radius
     var price = appState.price;
@@ -298,7 +309,7 @@ class _YelpResultRouteState extends State<YelpResultRoute> {
 
   @override
   Widget build(BuildContext context) {
-    Widget SelectedYelpBusiness = FutureBuilder<List>(
+    Widget selectedYelpBusiness = FutureBuilder<List>(
         future: yelpBusinesses,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
@@ -306,7 +317,7 @@ class _YelpResultRouteState extends State<YelpResultRoute> {
             yelpBusinessReviews =
                 fetchYelpBusinessDetails(snapshot.data![0].id);
 
-            Widget ReviewSection = FutureBuilder<List>(
+            Widget reviewSection = FutureBuilder<List>(
               future: yelpBusinessReviews,
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
@@ -322,7 +333,7 @@ class _YelpResultRouteState extends State<YelpResultRoute> {
 
             return Column(
               children: [
-                _buildImageSection(snapshot.data![0].image_url),
+                _buildImageSection(snapshot.data![0].imageUrl),
                 _buildTitleSection(snapshot.data![0].name),
                 _buildCategories(snapshot.data![0].categories),
                 _buildAddressSection(
@@ -330,9 +341,9 @@ class _YelpResultRouteState extends State<YelpResultRoute> {
                 _buildMetaDataSection(
                     snapshot.data![0].price,
                     snapshot.data![0].rating.toString(),
-                    snapshot.data![0].review_count.toString(),
-                    snapshot.data![0].display_phone,
-                    snapshot.data![0].is_closed),
+                    snapshot.data![0].reviewCount.toString(),
+                    snapshot.data![0].displayPhone,
+                    snapshot.data![0].isClosed),
                 _buildTransactionsSection(snapshot.data![0].transactions),
                 SizedBox(
                   height: 150,
@@ -361,7 +372,7 @@ class _YelpResultRouteState extends State<YelpResultRoute> {
                 Container(
                     padding: const EdgeInsets.only(
                         left: 8, right: 8, top: 16, bottom: 32),
-                    child: ReviewSection),
+                    child: reviewSection),
               ],
             );
           } else if (snapshot.hasError) {
@@ -382,7 +393,7 @@ class _YelpResultRouteState extends State<YelpResultRoute> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Center(child: SelectedYelpBusiness),
+                child: Center(child: selectedYelpBusiness),
               ),
               Padding(
                 padding: const EdgeInsets.only(bottom: 45),
@@ -412,7 +423,7 @@ class _YelpResultRouteState extends State<YelpResultRoute> {
 
   Widget _buildTitleSection(String title) {
     return Container(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.only(top: 8, bottom: 8),
       child: Row(
         children: [
           Expanded(
@@ -447,7 +458,7 @@ class _YelpResultRouteState extends State<YelpResultRoute> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 16),
+                padding: const EdgeInsets.only(top: 16),
                 child: Text(
                   addressString,
                   style: TextStyle(
@@ -469,7 +480,7 @@ class _YelpResultRouteState extends State<YelpResultRoute> {
         Row(
           children: [
             Container(
-              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 4),
+              padding: const EdgeInsets.only(top: 4),
               child: Text(
                 '$price | $rating stars | $reviewCount reviews | $phone',
                 style: TextStyle(
@@ -482,7 +493,7 @@ class _YelpResultRouteState extends State<YelpResultRoute> {
         Row(
           children: [
             Container(
-              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8),
+              padding: const EdgeInsets.only(top: 8),
               child: Container(
                 padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 4, bottom: 4),
                 decoration: BoxDecoration(
@@ -510,15 +521,15 @@ class _YelpResultRouteState extends State<YelpResultRoute> {
           Expanded(
             child: Wrap(
               runSpacing: 4.0,
+              spacing: 8.0,
               children: [
                 for (var category in categories)
                   Container(
-                      padding: const EdgeInsets.only(left: 8.0, right: 8.0),
                       child: Container(
                         padding: const EdgeInsets.only(
                             top: 4, bottom: 4, left: 8, right: 8),
                         decoration: BoxDecoration(
-                          color: Colors.redAccent,
+                          color: Colors.black87,
                           borderRadius: BorderRadius.circular(5),
                         ),
                         child: Text(category['title'],
@@ -538,7 +549,7 @@ class _YelpResultRouteState extends State<YelpResultRoute> {
     return Container(
       alignment: Alignment.centerLeft,
       padding:
-          const EdgeInsets.only(left: 8.0, right: 8.0, top: 4, bottom: 16),
+          const EdgeInsets.only(top: 4, bottom: 16),
       child: Row(
         children: [
           const Text('Transactions: ',
@@ -552,7 +563,7 @@ class _YelpResultRouteState extends State<YelpResultRoute> {
                   const EdgeInsets.only(top: 4, bottom: 4, left: 8, right: 8),
               child: Text(transaction,
                   style: const TextStyle(
-                    color: Colors.redAccent,
+                    color: Colors.black87,
                   )),
             )),
         ],
@@ -586,7 +597,6 @@ class _YelpResultRouteState extends State<YelpResultRoute> {
                     children: [
                       Text(
                         review.text + ' - ${review.user['name']}',
-                        softWrap: true,
                       ),
                     ],
                   ),
@@ -603,10 +613,10 @@ class YelpBusiness {
   final String id;
   final String alias;
   final String name;
-  final String image_url;
-  final bool is_closed;
+  final String imageUrl;
+  final bool isClosed;
   final String url;
-  final int review_count;
+  final int reviewCount;
   final List categories;
   final double rating;
   final Map coordinates;
@@ -614,16 +624,16 @@ class YelpBusiness {
   final String price;
   final Map location;
   final String phone;
-  final String display_phone;
+  final String displayPhone;
 
   const YelpBusiness({
     required this.id,
     required this.alias,
     required this.name,
-    required this.image_url,
-    required this.is_closed,
+    required this.imageUrl,
+    required this.isClosed,
     required this.url,
-    required this.review_count,
+    required this.reviewCount,
     required this.categories,
     required this.rating,
     required this.coordinates,
@@ -631,7 +641,7 @@ class YelpBusiness {
     required this.price,
     required this.location,
     required this.phone,
-    required this.display_phone,
+    required this.displayPhone,
   });
 
   factory YelpBusiness.fromJson(Map<String, dynamic> json) {
@@ -639,10 +649,10 @@ class YelpBusiness {
       id: json['id'],
       alias: json['alias'],
       name: json['name'],
-      image_url: json['image_url'],
-      is_closed: json['is_closed'],
+      imageUrl: json['image_url'],
+      isClosed: json['is_closed'],
       url: json['url'],
-      review_count: json['review_count'],
+      reviewCount: json['review_count'],
       categories: json['categories'],
       rating: json['rating'],
       coordinates: json['coordinates'],
@@ -650,13 +660,14 @@ class YelpBusiness {
       price: json['price'],
       location: json['location'],
       phone: json['phone'],
-      display_phone: json['display_phone'],
+      displayPhone: json['display_phone'],
     );
   }
 }
 
 Future<List> fetchYelpBusiness(
     String searchTerm, int price, int radius, Map latLong) async {
+  // Might want to add open_now=true to the query parameters
   var apiEndpoint =
       'https://api.yelp.com/v3/businesses/search?term=$searchTerm&sort_by=best_match&limit=30';
 
@@ -673,12 +684,9 @@ Future<List> fetchYelpBusiness(
     apiEndpoint += '&latitude=${latLong['lat']}&longitude=${latLong['long']}';
   }
 
-  print(apiEndpoint);
-
   const headers = {
     "accept": 'application/json',
-    "Authorization":
-        'Bearer o68rs5vHugffSzIC4WRHFYFo4z-RB3-QLsYb1YAB1SoXLirNkSd24UuTLE5dIwmeNiHSA_BR8KzarnajjixScclbxOA-ww0FmA5vBztLjYM63m5aVqXxnYtt7DHtZHYx'
+    "Authorization": yelpApiKey
   };
   final response = await http.get(Uri.parse(apiEndpoint), headers: headers);
 
@@ -732,8 +740,7 @@ Future<List> fetchYelpBusinessDetails(String businessId) async {
   const apiEndpoint = 'https://api.yelp.com/v3/businesses/';
   const headers = {
     "accept": 'application/json',
-    "Authorization":
-        'Bearer o68rs5vHugffSzIC4WRHFYFo4z-RB3-QLsYb1YAB1SoXLirNkSd24UuTLE5dIwmeNiHSA_BR8KzarnajjixScclbxOA-ww0FmA5vBztLjYM63m5aVqXxnYtt7DHtZHYx'
+    "Authorization": yelpApiKey,
   };
   final response = await http.get(
       Uri.parse('$apiEndpoint$businessId/reviews?limit=20&sort_by=yelp_sort'),

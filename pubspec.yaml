@@ -65,9 +65,9 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - images/Yelp_Logo.svg.png
+    - images/yelp_burst.png
     - images/Google-Maps-logo.png
-    - images/png-transparent-flutter-hd-logo.png
+    - images/icon_flutter.png
     # - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
