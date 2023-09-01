@@ -1,12 +1,13 @@
 import 'dart:convert' show jsonDecode;
-import 'dart:ffi';
+// import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'dart:developer';
+// import 'dart:developer';
 import 'dart:math';
 import 'package:provider/provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:geolocator/geolocator.dart';
 
 void main() {
   runApp(const MyApp());
@@ -34,8 +35,9 @@ class MyApp extends StatelessWidget {
 
 class MyAppState extends ChangeNotifier {
   var searchTerm = '';
-  var price = 1;
-  var radius = 20000;
+  var price = 2;
+  var radius = 1609;
+  var latLong = {'lat': 0.0, 'long': 0.0};
 }
 
 // Homepage Route
@@ -54,6 +56,17 @@ class _HomepageRouteState extends State<HomepageRoute> {
     var selectedPrice = appState.price;
     var selectedRadius = appState.radius;
 
+    // Attempt to get the user's device location and check for any errors being returned
+    _determinePosition().then((value) {
+      setState(() {
+        appState.latLong['lat'] = value.latitude;
+        appState.latLong['long'] = value.longitude;
+      });
+    }).catchError((error) {
+      print(error);
+    });
+
+    // ! Probably should wait to see if the location could be set before rendering the page
     return Scaffold(
       appBar: AppBar(
         title: const Text(''),
@@ -89,7 +102,7 @@ class _HomepageRouteState extends State<HomepageRoute> {
             child: TextField(
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: 'Enter a search term',
+                labelText: 'Search term (optional)',
               ),
               onChanged: (text) {
                 setState(() {
@@ -105,7 +118,6 @@ class _HomepageRouteState extends State<HomepageRoute> {
                 Padding(
                   padding: const EdgeInsets.only(right: 8.0),
                   child: ElevatedButton(
-                      child: const Text('\$'),
                       style: ElevatedButton.styleFrom(
                         foregroundColor:
                             selectedPrice == 1 ? Colors.white : null,
@@ -116,12 +128,12 @@ class _HomepageRouteState extends State<HomepageRoute> {
                         setState(() {
                           appState.price = 1;
                         });
-                      }),
+                      },
+                      child: const Text('\$')),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: ElevatedButton(
-                      child: const Text('\$\$'),
                       style: ElevatedButton.styleFrom(
                         foregroundColor:
                             selectedPrice == 2 ? Colors.white : null,
@@ -132,12 +144,12 @@ class _HomepageRouteState extends State<HomepageRoute> {
                         setState(() {
                           appState.price = 2;
                         });
-                      }),
+                      },
+                      child: const Text('\$\$')),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: ElevatedButton(
-                      child: const Text('\$\$\$'),
                       style: ElevatedButton.styleFrom(
                         foregroundColor:
                             selectedPrice == 3 ? Colors.white : null,
@@ -148,7 +160,8 @@ class _HomepageRouteState extends State<HomepageRoute> {
                         setState(() {
                           appState.price = 3;
                         });
-                      }),
+                      },
+                      child: const Text('\$\$\$')),
                 ),
               ],
             ),
@@ -160,7 +173,6 @@ class _HomepageRouteState extends State<HomepageRoute> {
                 Padding(
                   padding: const EdgeInsets.only(right: 8.0),
                   child: ElevatedButton(
-                      child: const Text('1 mi'),
                       style: ElevatedButton.styleFrom(
                         foregroundColor:
                             selectedRadius == 1609 ? Colors.white : null,
@@ -171,12 +183,12 @@ class _HomepageRouteState extends State<HomepageRoute> {
                         setState(() {
                           appState.radius = 1609;
                         });
-                      }),
+                      },
+                      child: const Text('1 mi')),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(right: 8.0),
                   child: ElevatedButton(
-                      child: const Text('5 mi'),
                       style: ElevatedButton.styleFrom(
                         foregroundColor:
                             selectedRadius == 8046 ? Colors.white : null,
@@ -187,12 +199,12 @@ class _HomepageRouteState extends State<HomepageRoute> {
                         setState(() {
                           appState.radius = 8046;
                         });
-                      }),
+                      },
+                      child: const Text('5 mi')),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: ElevatedButton(
-                      child: const Text('15 mi'),
                       style: ElevatedButton.styleFrom(
                         foregroundColor:
                             selectedRadius == 24140 ? Colors.white : null,
@@ -203,12 +215,12 @@ class _HomepageRouteState extends State<HomepageRoute> {
                         setState(() {
                           appState.radius = 24140;
                         });
-                      }),
+                      },
+                      child: const Text('15 mi')),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: ElevatedButton(
-                      child: const Text('25 mi'),
                       style: ElevatedButton.styleFrom(
                         foregroundColor:
                             selectedRadius == 40000 ? Colors.white : null,
@@ -219,7 +231,8 @@ class _HomepageRouteState extends State<HomepageRoute> {
                         setState(() {
                           appState.radius = 40000;
                         });
-                      }),
+                      },
+                      child: const Text('25 mi')),
                 ),
               ],
             ),
@@ -262,7 +275,6 @@ class _YelpResultRouteState extends State<YelpResultRoute> {
   late Future<List> yelpBusinessReviews;
 
   late GoogleMapController mapController;
-  final LatLng _center = const LatLng(45.521563, -122.677433);
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
   }
@@ -273,12 +285,15 @@ class _YelpResultRouteState extends State<YelpResultRoute> {
 
     // Get the MyappState
     var appState = context.read<MyAppState>();
-    // Set the price and the radius
+    // Get the price and the radius
     var price = appState.price;
     var radius = appState.radius;
     var searchTerm = appState.searchTerm;
 
-    yelpBusinesses = fetchYelpBusiness(searchTerm, price, radius);
+    // Get the lat and long of the device
+    var latLong = appState.latLong;
+
+    yelpBusinesses = fetchYelpBusiness(searchTerm, price, radius, latLong);
   }
 
   @override
@@ -316,10 +331,11 @@ class _YelpResultRouteState extends State<YelpResultRoute> {
                     snapshot.data![0].price,
                     snapshot.data![0].rating.toString(),
                     snapshot.data![0].review_count.toString(),
-                    snapshot.data![0].display_phone),
+                    snapshot.data![0].display_phone,
+                    snapshot.data![0].is_closed),
                 _buildTransactionsSection(snapshot.data![0].transactions),
                 SizedBox(
-                  height: 200,
+                  height: 150,
                   child: GoogleMap(
                     onMapCreated: _onMapCreated,
                     initialCameraPosition: CameraPosition(
@@ -358,7 +374,7 @@ class _YelpResultRouteState extends State<YelpResultRoute> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(''),
+        title: const Text(''),
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -447,18 +463,42 @@ class _YelpResultRouteState extends State<YelpResultRoute> {
   }
 
   Widget _buildMetaDataSection(
-      String price, String rating, String reviewCount, String phone) {
-    return Row(
+      String price, String rating, String reviewCount, String phone, bool isClosed) {
+    return Column(
       children: [
-        Container(
-          padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 4),
-          child: Text(
-            '${price} | ${rating} stars | ${reviewCount} reviews | ${phone}',
-            style: TextStyle(
-              color: Colors.grey[500],
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 4),
+              child: Text(
+                '$price | $rating stars | $reviewCount reviews | $phone',
+                style: TextStyle(
+                  color: Colors.grey[500],
+                ),
+              ),
             ),
-          ),
+          ],
         ),
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8),
+              child: Container(
+                padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 4, bottom: 4),
+                decoration: BoxDecoration(
+                  color: isClosed ? Colors.redAccent[100] : Colors.green[100],
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: Text(
+                  isClosed ? 'Closed now' : 'Open now',
+                  style: TextStyle(
+                    color: isClosed ? Colors.redAccent : Colors.green,
+                  ),
+                ),
+              ),
+            )
+          ],
+        )
       ],
     );
   }
@@ -498,7 +538,7 @@ class _YelpResultRouteState extends State<YelpResultRoute> {
     return Container(
       alignment: Alignment.centerLeft,
       padding:
-          const EdgeInsets.only(left: 8.0, right: 8.0, top: 16, bottom: 16),
+          const EdgeInsets.only(left: 8.0, right: 8.0, top: 4, bottom: 16),
       child: Row(
         children: [
           const Text('Transactions: ',
@@ -615,9 +655,10 @@ class YelpBusiness {
   }
 }
 
-Future<List> fetchYelpBusiness(String searchTerm, int price, int radius) async {
+Future<List> fetchYelpBusiness(
+    String searchTerm, int price, int radius, Map latLong) async {
   var apiEndpoint =
-      'https://api.yelp.com/v3/businesses/search?location=Honolulu&term=$searchTerm&sort_by=best_match&limit=20';
+      'https://api.yelp.com/v3/businesses/search?term=$searchTerm&sort_by=best_match&limit=30';
 
   // If the price is not empty set the query parameter
   if (price > 0) {
@@ -627,6 +668,12 @@ Future<List> fetchYelpBusiness(String searchTerm, int price, int radius) async {
   if (radius > 0) {
     apiEndpoint += '&radius=$radius';
   }
+
+  if (latLong['lat'] != 0.0 && latLong['long'] != 0.0) {
+    apiEndpoint += '&latitude=${latLong['lat']}&longitude=${latLong['long']}';
+  }
+
+  print(apiEndpoint);
 
   const headers = {
     "accept": 'application/json',
@@ -642,9 +689,9 @@ Future<List> fetchYelpBusiness(String searchTerm, int price, int radius) async {
     // for (var business in jsonDecode(response.body)['businesses']) {
     //     businesses.add(YelpBusiness.fromJson(business));
     // }
-    final _random = new Random();
+    final random = Random();
     final decodedResponse = jsonDecode(response.body)['businesses'];
-    final randomIndex = _random.nextInt(decodedResponse.length);
+    final randomIndex = random.nextInt(decodedResponse.length);
     businesses.add(YelpBusiness.fromJson(decodedResponse[randomIndex]));
 
     return businesses;
@@ -682,14 +729,14 @@ class YelpBusinessReview {
 }
 
 Future<List> fetchYelpBusinessDetails(String businessId) async {
-  const api_endpoint = 'https://api.yelp.com/v3/businesses/';
+  const apiEndpoint = 'https://api.yelp.com/v3/businesses/';
   const headers = {
     "accept": 'application/json',
     "Authorization":
         'Bearer o68rs5vHugffSzIC4WRHFYFo4z-RB3-QLsYb1YAB1SoXLirNkSd24UuTLE5dIwmeNiHSA_BR8KzarnajjixScclbxOA-ww0FmA5vBztLjYM63m5aVqXxnYtt7DHtZHYx'
   };
   final response = await http.get(
-      Uri.parse('$api_endpoint$businessId/reviews?limit=20&sort_by=yelp_sort'),
+      Uri.parse('$apiEndpoint$businessId/reviews?limit=20&sort_by=yelp_sort'),
       headers: headers);
 
   if (response.statusCode == 200) {
@@ -707,4 +754,45 @@ Future<List> fetchYelpBusinessDetails(String businessId) async {
     // then throw an exception.
     throw Exception('Failed to load business details');
   }
+}
+
+/// Determine the current position of the device.
+///
+/// When the location services are not enabled or permissions
+/// are denied the `Future` will return an error.
+Future<Position> _determinePosition() async {
+  bool serviceEnabled;
+  LocationPermission permission;
+
+  // Test if location services are enabled.
+  serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  if (!serviceEnabled) {
+    // Location services are not enabled don't continue
+    // accessing the position and request users of the
+    // App to enable the location services.
+    return Future.error('Location services are disabled.');
+  }
+
+  permission = await Geolocator.checkPermission();
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      // Permissions are denied, next time you could try
+      // requesting permissions again (this is also where
+      // Android's shouldShowRequestPermissionRationale
+      // returned true. According to Android guidelines
+      // your App should show an explanatory UI now.
+      return Future.error('Location permissions are denied');
+    }
+  }
+
+  if (permission == LocationPermission.deniedForever) {
+    // Permissions are denied forever, handle appropriately.
+    return Future.error(
+        'Location permissions are permanently denied, we cannot request permissions.');
+  }
+
+  // When we reach here, permissions are granted and we can
+  // continue accessing the position of the device.
+  return await Geolocator.getCurrentPosition();
 }
