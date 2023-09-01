@@ -11,7 +11,12 @@ import GoogleMaps
     GeneratedPluginRegistrant.register(with: self)
 
     // Google Maps API Key
-    GMSServices.provideAPIKey("AIzaSyCDqaEZmWOGUGrJ5JxsxWrXRti8ij01_iE")
+    if let path = Bundle.main.path(forResource: "APIKey", ofType: "plist") {
+      let nsDictionary = NSDictionary(contentsOfFile: path)
+      if let apiKey = nsDictionary?["apiKey"] as? String {
+        GMSServices.provideAPIKey(apiKey)
+      }
+    }
 
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
