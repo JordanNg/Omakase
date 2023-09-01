@@ -78,34 +78,22 @@ class _HomepageRouteState extends State<HomepageRoute> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            padding: const EdgeInsets.only(bottom: 32),
-            child: const Text(
-              'お任せ',
-              style: TextStyle(fontSize: 90, fontWeight: FontWeight.bold),
-            ),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.only(left:16.0, right: 16.0),
+                child: const Text(
+                  'Omakase',
+                  style: TextStyle(fontSize: 65, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
+                ),
+              ),
+            ],
           ),
           Container(
-            padding: const EdgeInsets.only(bottom: 32),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Image.asset(
-                  'images/icon_flutter.png',
-                  height: 50,
-                  fit: BoxFit.contain,
-                ),
-                Image.asset(
-                  'images/yelp_burst.png',
-                  height: 50,
-                  fit: BoxFit.contain,
-                ),
-                Image.asset(
-                  'images/Google-Maps-logo.png',
-                  height: 50,
-                  fit: BoxFit.contain,
-                ),
-              ],
+            padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 64),
+            child: const Text(
+              'お任せ - a Japanese phrase, used when ordering food in restaurants, that means "I\'ll leave it up to you".',
+              style: TextStyle(fontSize: 14, color: Colors.grey),
             ),
           ),
           Container(
@@ -128,51 +116,36 @@ class _HomepageRouteState extends State<HomepageRoute> {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(right: 8.0),
-                  child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor:
-                            selectedPrice == 1 ? Colors.white : null,
-                        backgroundColor:
-                            selectedPrice == 1 ? Colors.black87 : null,
-                      ),
+                  child: InputChip(
                       onPressed: () {
                         setState(() {
                           appState.price = 1;
                         });
                       },
-                      child: const Text('\$')),
+                      selected: selectedPrice == 1,
+                      label: const Text('\$')),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor:
-                            selectedPrice == 2 ? Colors.white : null,
-                        backgroundColor:
-                            selectedPrice == 2 ? Colors.black87 : null,
-                      ),
+                  child: InputChip(
                       onPressed: () {
                         setState(() {
                           appState.price = 2;
                         });
                       },
-                      child: const Text('\$\$')),
+                      selected: selectedPrice == 2,
+                      label: const Text('\$\$')),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor:
-                            selectedPrice == 3 ? Colors.white : null,
-                        backgroundColor:
-                            selectedPrice == 3 ? Colors.black87 : null,
-                      ),
+                  child: InputChip(
                       onPressed: () {
                         setState(() {
                           appState.price = 3;
                         });
                       },
-                      child: const Text('\$\$\$')),
+                      selected: selectedPrice == 3,
+                      label: const Text('\$\$\$')),
                 ),
               ],
             ),
@@ -183,67 +156,47 @@ class _HomepageRouteState extends State<HomepageRoute> {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(right: 8.0),
-                  child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor:
-                            selectedRadius == 1609 ? Colors.white : null,
-                        backgroundColor:
-                            selectedRadius == 1609 ? Colors.black87 : null,
-                      ),
+                  child: InputChip(
                       onPressed: () {
                         setState(() {
                           appState.radius = 1609;
                         });
                       },
-                      child: const Text('1 mi')),
+                      selected: selectedRadius == 1609,
+                      label: const Text('1 mi')),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(right: 8.0),
-                  child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor:
-                            selectedRadius == 8046 ? Colors.white : null,
-                        backgroundColor:
-                            selectedRadius == 8046 ? Colors.black87 : null,
-                      ),
+                  child: InputChip(
                       onPressed: () {
                         setState(() {
                           appState.radius = 8046;
                         });
                       },
-                      child: const Text('5 mi')),
+                      selected: selectedRadius == 8046,
+                      label: const Text('5 mi')),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor:
-                            selectedRadius == 24140 ? Colors.white : null,
-                        backgroundColor:
-                            selectedRadius == 24140 ? Colors.black87 : null,
-                      ),
+                  child: InputChip(
                       onPressed: () {
                         setState(() {
                           appState.radius = 24140;
                         });
                       },
-                      child: const Text('15 mi')),
+                      selected: selectedRadius == 24140,
+                      label: const Text('15 mi')),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor:
-                            selectedRadius == 40000 ? Colors.white : null,
-                        backgroundColor:
-                            selectedRadius == 40000 ? Colors.black87 : null,
-                      ),
+                  child: InputChip(
                       onPressed: () {
                         setState(() {
                           appState.radius = 40000;
                         });
                       },
-                      child: const Text('25 mi')),
+                      selected: selectedRadius == 40000,
+                      label: const Text('25 mi')),
                 ),
               ],
             ),
@@ -254,7 +207,7 @@ class _HomepageRouteState extends State<HomepageRoute> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 ElevatedButton(
-                  child: const Text('Locate a restaurant!'),
+                  child: const Text('Search'),
                   onPressed: () {
                     // Navigate to the Yelp results route
                     Navigator.push(
@@ -335,13 +288,12 @@ class _YelpResultRouteState extends State<YelpResultRoute> {
               children: [
                 _buildImageSection(snapshot.data![0].imageUrl),
                 _buildTitleSection(snapshot.data![0].name),
+                _buildRatingSection(snapshot.data![0].rating, snapshot.data![0].reviewCount),
                 _buildCategories(snapshot.data![0].categories),
                 _buildAddressSection(
                     snapshot.data![0].location['display_address']),
                 _buildMetaDataSection(
                     snapshot.data![0].price,
-                    snapshot.data![0].rating.toString(),
-                    snapshot.data![0].reviewCount.toString(),
                     snapshot.data![0].displayPhone,
                     snapshot.data![0].isClosed),
                 _buildTransactionsSection(snapshot.data![0].transactions),
@@ -446,6 +398,58 @@ class _YelpResultRouteState extends State<YelpResultRoute> {
     );
   }
 
+  Widget _buildRatingSection(double rating, int reviewCount) {
+    // Convert the double rating to represent the format of the Yelp star rating image names
+    // Get the integer value of the rating
+    var ratingInt = rating.toInt();
+    // Get the decimal value of the rating by splitting the double into a string of just the decimal 
+    // then converting the decimal string back to a double
+    var ratingString = rating.toString();
+    var ratingDecimal = double.parse(ratingString.substring(
+        ratingString.indexOf('.'), ratingString.indexOf('.') + 2));
+    
+    // Create the star rating string
+    var starRatingString = '${ratingInt.toString()}${(ratingDecimal == 0.5 ? '_half' : '')}@3x.png';
+
+    return Container(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                    padding: const EdgeInsets.only(bottom: 0),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.only(left: 0),
+                          child: Image.asset(
+                            'images/yelp_stars/web_and_ios/regular/regular_$starRatingString',
+                            width: 100,
+                            height: 20,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.only(left: 8),
+                          child: Text(
+                            '$reviewCount reviews',
+                            style: const TextStyle(
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ),
+                      ],
+                    )),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildAddressSection(List location) {
     String addressString = '';
     // Create the address string
@@ -474,7 +478,7 @@ class _YelpResultRouteState extends State<YelpResultRoute> {
   }
 
   Widget _buildMetaDataSection(
-      String price, String rating, String reviewCount, String phone, bool isClosed) {
+      String price, String phone, bool isClosed) {
     return Column(
       children: [
         Row(
@@ -482,7 +486,7 @@ class _YelpResultRouteState extends State<YelpResultRoute> {
             Container(
               padding: const EdgeInsets.only(top: 4),
               child: Text(
-                '$price | $rating stars | $reviewCount reviews | $phone',
+                '$price | $phone',
                 style: TextStyle(
                   color: Colors.grey[500],
                 ),
